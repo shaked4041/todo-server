@@ -41,8 +41,6 @@ async function readOne(filter) {
 async function updateById(id,data){
    return await taskModel.updateOne({_id:id},data)
 }
-
-
 async function deleteOne(taskId) {
    try {
      // Check if the task exists
