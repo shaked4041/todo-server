@@ -22,18 +22,7 @@ router.get("/", async (req, res) => {
     console.error(error);
     res.status(500).send(error || 'something went wrong');
   }
-});
-
-router.get("/:taskId", async (req, res) => {
-  try {
-    const task = await taskService.getTask(req.params.taskId);
-    if (!task) throw "task not found";
-    res.json(task);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(error || 'something went wrong');
-  }
-});
+});  
 
 
 router.get("/:userId", async (req, res) => {
@@ -47,6 +36,17 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+
+router.get("/:taskId", async (req, res) => {
+  try {
+    const task = await taskService.getTask(req.params.taskId);
+    if (!task) throw "task not found";
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error || 'something went wrong');
+  }  
+});  
 
 
 

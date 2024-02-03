@@ -1,15 +1,11 @@
 const userController = require('./user.controller')
-// const mongoose = require('mongoose')
-const taskModel = require('../tasks/task.model')
 const userModel = require('../users/user.model')
-// require('../items/item.model')
-require('./user.model')
+ require('../tasks/task.model')
 
 
 
 async function getAllUsers() {
   try {
-      // const users = await userModel.find({ isActive: true });
       const users = await userController.read();
       return users;
   } catch (error) {
@@ -18,33 +14,16 @@ async function getAllUsers() {
 }
 
 
-function getUser(filter) {
-    return userController.readOne(filter)
+
+async function getUser(userId) {
+  try {
+      const user = await userController.readOne(userId)
+      return user;
+  } catch (error) {
+      throw new Error(`Failed to fetch user ${userId}: ${error.message}`);
+  }
 }
 
-// function getUser(userId) {
-//     return userController.readOne({_id:userId})
-// }
-
-
-async function getUserOrders(userId) {
-    try {
-        const orders = await userController.read({_id: userId }).populate('items');
-        return orders;
-    } catch (error) {
-        throw error;
-    }
-}
-
-
-
-// validation fields
-// email is not exist
-// create new user (db)
-// .
-// .
-// .
-// return newUser
 
 const addNewUser = async(data) =>{
   if (Object.keys(data).length !== 3) throw "missing data";
@@ -76,4 +55,15 @@ const addNewUser = async(data) =>{
 }
 
 
-module.exports = { getAllUsers, getUser, addNewUser, updateUser, getUserOrders };
+async function deleteUser(userId){
+  const user = await userController.readById( userId);
+  if (!user) throw "user doesnt exists";
+
+  if(!user.tasks){
+    return await userController.deleteUser(userId)
+  }
+  
+}
+
+
+module.exports = { getAllUsers, getUser, addNewUser, updateUser,deleteUser };

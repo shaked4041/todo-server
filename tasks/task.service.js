@@ -48,7 +48,7 @@ async function gettasksByUser(userId){
     if (!tasks) {
       throw new Error("task not found");
     }
-    return task;
+    return tasks;
   } catch (error) {
     throw new Error(`Failed to fetch tasks by user: ${userId}: ${error.message}`);
 
@@ -85,7 +85,7 @@ async function addNewtask(data) {
     user.tasks.push(newTask);
 
     user =  await usersController.updateById(user._id, { tasks: user.tasks })
-    user = await userModel.findById(user._id).populate('tasks.task');
+    user = await userModel.findById(user._id).populate('tasks');
 
     // user = userModel.findOne(user.userName).populate('tasks taskId')
 
@@ -102,15 +102,22 @@ async function updateTask(taskId, data){
   const existingtask = await taskController.readOne({ _id: taskId });
 if (!existingtask) throw "task doesnt exists";
 let updatedtask = await taskController.updateById(taskId, data)
-//  await taskController.readOne({ _id: taskId });
 return updatedtask
 }
 
-
 async function deleteSingleTask(taskId){
-  const existingtask = await taskController.readOne({ _id: taskId });
-  if (!existingtask) throw "task doesnt exists";
- return await taskController.deleteSingleTask(taskId)
+  try {
+    const existingTask = await taskController.readOne({ _id: taskId });
+    if (!existingTask) throw new Error("Task doesn't exist");
+    await taskController.deleteOne(taskId);
+    let user = await usersController.readOne({ _id: existingTask.userId });
+    if (!user) throw new Error("User not found");
+    user.tasks = user.tasks.filter(task => task.toString() !== taskId);
+    const updatedUser = await usersController.updateById(user._id, { tasks: user.tasks });
+    return updatedUser;
+  } catch (error) {
+    throw new Error(`Failed to delete task: ${error.message}`);
+  }
 }
 
 async function deleteMany(filter){

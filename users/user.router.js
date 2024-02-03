@@ -10,11 +10,11 @@ const userService = require('./user.service')
 // get all users
 router.get('/', async (req, res) => {
    try {
-       const users = await userService.getAllUsers();
-       res.json(users);
+      const users = await userService.getAllUsers();
+      res.json(users);
    } catch (error) {
-       console.error(error);
-       res.status(500).send(error || 'something went wrong');
+      console.error(error);
+      res.status(500).send(error || 'something went wrong');
    }
 });
 
@@ -34,15 +34,6 @@ router.get('/:userId', async (req, res) => {
    }
 })
 
-router.get('/:userId/tasks', async (req, res) => {
-   try {
-      const orders = await userService.getUsertasks(req.params.userId);
-      res.json(orders);
-   } catch (error) {
-      console.error(error);
-      res.status(error.status || 500).send(error?.msg || 'Error occurred');
-   }
-})
 
 router.post('/', async (req, res) => {
    try {
@@ -60,15 +51,31 @@ router.put('/:userId', async (req, res) => {
       const { userId } = req.params;
       const updatedUser = await userService.updateUser(userId, req.body);
       if (!updatedUser) {
-          res.status(404).json({ error: 'User not found' });
-          return;
+         res.status(404).json({ error: 'User not found' });
+         return;
       }
-      res.json(updatedUser); 
+      res.json(updatedUser);
    } catch (error) {
       console.error('Error in updateUser route:', error);
       res.status(error.status || 500).send(error?.msg || 'something went wrong')
    }
 })
+
+
+router.delete('/:userId'), async (req, res) => {
+   try {
+      const { userId } = req.params;
+      await userService.deleteUser(userId)
+      // if (!result) {
+      //    res.status(404).json({ error: 'User not found' });
+      //    return;
+      // }
+      res.json('user deleted');
+   } catch (error) {
+      console.error('Error in updateUser route:', error);
+      res.status(error.status || 500).send(error?.msg || 'something went wrong')
+   }
+}
 
 
 module.exports = router
